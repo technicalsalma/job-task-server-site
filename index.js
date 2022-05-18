@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
@@ -19,23 +19,32 @@ const client = new MongoClient(uri, {
 
 async function run(){
     try{
-     await client.connect();
-     const userCollection = client.db('job_task').collection('tasks');
-    
-     //===Get===//
-     app.get('/user',async(req, res)=>{
-         const query = {};
-         const cursor = userCollection.find(query);
-         const users = await cursor.toArray();
-         res.send(users)
-     });
-     //===POST===//
-     app.post('/user', async(req, res)=>{
-         const newUser = req.body;
-         const result = await userCollection.insertOne(newUser);
-         res.send(result)
-     })
+      await client.connect();
+      const userCollection = client.db("job_task").collection("tasks");
 
+      //===Get===//
+      app.get("/user", async (req, res) => {
+        const query = {};
+        const cursor = userCollection.find(query);
+        const users = await cursor.toArray();
+        res.send(users);
+      });
+      //===POST===//
+      app.post("/user", async (req, res) => {
+        const newUser = req.body;
+        console.log(newUser);
+        const result = await userCollection.insertOne(newUser);
+        res.send(result);
+      });
+
+      //===Delete===//
+      app.delete("/user/:id", async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) };
+        console.log(query);
+        const result = await userCollection.deleteOne(query);
+        res.send(result);
+      });
     }
     finally{
 
